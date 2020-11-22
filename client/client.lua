@@ -1,6 +1,6 @@
-
-RegisterNetEvent('mechtest1')
-AddEventHandler('mechtest1', function()
+-- request vehicle info
+RegisterNetEvent('vehicleInfo')
+AddEventHandler('vehicleInfo', function()
     local playerPed = PlayerPedId()
     local coords = GetEntityCoords(playerPed)
 
@@ -18,8 +18,8 @@ end)
 
 
 -- flip car
-RegisterNetEvent('mechtest3')
-AddEventHandler('mechtest3', function()
+RegisterNetEvent('flipCar')
+AddEventHandler('flipCar', function()
     local playerPed = PlayerPedId()
     local coords = GetEntityCoords(playerPed)
 
@@ -54,9 +54,9 @@ tyreIndex = 0 to 4 on normal vehicles
 '47 = 6 wheels trailer mid wheel right  
 ]]
 
-
-RegisterNetEvent('mechtest2')
-AddEventHandler('mechtest2', function()
+-- partial fix event
+RegisterNetEvent('roadsideFix')
+AddEventHandler('roadsideFix', function()
     local playerPed = PlayerPedId()
     local coords = GetEntityCoords(playerPed)
 
@@ -81,13 +81,6 @@ AddEventHandler('mechtest2', function()
         SetVehicleTyreFixed(vehicle, 47)
     end
 end)
-
-
-
-
-
-
-
 
 -- full fix event
 RegisterNetEvent('fixVehicle')

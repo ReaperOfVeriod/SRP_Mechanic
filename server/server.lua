@@ -9,17 +9,21 @@ ESX.RegisterUsableItem('mechanictools', function(source)
     TriggerClientEvent('fixVehicle', source, xPlayer.getInventoryItem('mechanictools').count)
 end)
 
-RegisterCommand('mechtest', function(source,args,raw)
+-- toolkit registration for roadside repairs
+ESX.RegisterUsableItem('peasanttools', function(source)
     local source = tonumber(source)
-    TriggerClientEvent('mechtest1', source)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    TriggerClientEvent('roadsideFix', source)
 end)
 
-RegisterCommand('mechtestfix', function(source,args,raw)
+-- command registration for vehicle info
+RegisterCommand('vehicleinfo', function(source,args,raw)
     local source = tonumber(source)
-    TriggerClientEvent('mechtest2', source)
+    TriggerClientEvent('vehicleInfo', source)
 end)
 
-RegisterCommand('mechtestflip', function(source,args,raw)
+-- command registration for flipping car
+RegisterCommand('flipcar', function(source,args,raw)
     local source = tonumber(source)
-    TriggerClientEvent('mechtest3', source)
+    TriggerClientEvent('flipCar', source)
 end)
