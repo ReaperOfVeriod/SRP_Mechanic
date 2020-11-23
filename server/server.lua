@@ -13,7 +13,7 @@ end)
 ESX.RegisterUsableItem('peasanttools', function(source)
     local source = tonumber(source)
     local xPlayer = ESX.GetPlayerFromId(source)
-    TriggerClientEvent('roadsideFix', source, xPlayer.getInventoryItem('mechanictools').count)
+    TriggerClientEvent('roadsideFix', source, xPlayer.getInventoryItem('peasanttools').count)
 end)
 
 -- command registration for vehicle info
@@ -26,4 +26,12 @@ end)
 RegisterCommand('flipcar', function(source,args,raw)
     local source = tonumber(source)
     TriggerClientEvent('flipCar', source)
+end)
+
+
+
+-- command registration for test 
+RegisterCommand('mechtest', function(source,args,raw)
+    local source = tonumber(source)
+    TriggerClientEvent('mechtest', source)
 end)
