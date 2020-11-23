@@ -13,7 +13,7 @@ end)
 ESX.RegisterUsableItem('peasanttools', function(source)
     local source = tonumber(source)
     local xPlayer = ESX.GetPlayerFromId(source)
-    TriggerClientEvent('roadsideFix', source)
+    TriggerClientEvent('roadsideFix', source, xPlayer.getInventoryItem('mechanictools').count)
 end)
 
 -- command registration for vehicle info
