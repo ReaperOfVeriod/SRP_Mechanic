@@ -1,3 +1,8 @@
+mechShops = {}
+mechShops[0] = {vector3(1117.0, -765.0, 0.0), vector3(1117.0, -802.0, 0.0), vector3(1163.0, -802.0, 0.0), vector3(1163.0, -765.0, 0.0)}
+mechShops[1] = {vector3(555.0, -163.0, 0.0), vector3(556.0, -202.0, 0.0), vector3(530.0, -249.0, 0.0), vector3(517.0, -164.0, 0.0)}
+
+
 -- request vehicle info
 RegisterNetEvent('vehicleInfo')
 AddEventHandler('vehicleInfo', function()
@@ -244,77 +249,63 @@ end)
 
 RegisterNetEvent('mechtest')
 AddEventHandler('mechtest', function()
+    isInMechanicShop = false
+    for k, v in pairs(mechShops) do
 
-    -- area of this perimeter should be 2152
-    local aVectorX = 555.0
-    local aVectorY = -163.0
-    local bVectorX = 517.0
-    local bVectorY = -164.0
-    local cVectorX = 530.0
-    local cVectorY = -249.0
-    local dVectorX = 556.0
-    local dVectorY = -202.0
-
-    local playerPed = PlayerPedId()
-    local coords = GetEntityCoords(playerPed)
-
-    local pVectorX = coords.x
-    local pVectorY = coords.y
-    
-    --calculate area of perimiter
-    function shoeArea(ps)
-        local function ssum(acc, p1, p2, ...)
-          if not p2 or not p1 then
-            return math.abs(0.5 * acc)
-          else
-            return ssum(acc + p1[1]*p2[2]-p1[2]*p2[1], p2, ...)
-          end
-        end
-        return ssum(0, ps[#ps], table.unpack(ps))
-    end
-       
-    local mechShopArea = {{555.0,-163.0}, {517.0,-164.0}, {530.0,-249.0}, {556.0,-202.0}} --table
-
-    local table1 = {{aVectorX, aVectorY}, {pVectorX, pVectorY}, {dVectorX,dVectorY}}
-    local delta1 = shoeArea(table1)
-    local table2 = {{dVectorX,dVectorY}, {pVectorX,pVectorY}, {cVectorX, cVectorY}}
-    local delta2 = shoeArea(table2)
-    local table3 = {{cVectorX, cVectorY}, {pVectorX, pVectorY}, {bVectorX, bVectorY}}
-    local delta3 = shoeArea(table3)
-    local table4 = {{pVectorX,pVectorY}, {bVectorX,bVectorY}, {aVectorX,aVectorY}}
-    local delta4 = shoeArea(table4)
-    local deltaSum = delta1 + delta2 + delta3 + delta4
-
-    if deltaSum == shoeArea(mechShopArea) then
-        print('you are in the mech area')
+        local aVector = mechShops[k][1]
+        local bVector = mechShops[k][2]
+        local cVector = mechShops[k][3]
+        local dVector = mechShops[k][4]
 
         local playerPed = PlayerPedId()
         local coords = GetEntityCoords(playerPed)
+
+        -- all vectors defined down to X and Y axis
+        local pVectorX = coords.x
+        local pVectorY = coords.y
+        local aVectorX = aVector.x
+        local aVectorY = aVector.y
+        local bVectorX = bVector.x
+        local bVectorY = bVector.y
+        local cVectorX = cVector.x
+        local cVectorY = cVector.y
+        local dVectorX = dVector.x
+        local dVectorY = dVector.y
     
-        if IsAnyVehicleNearPoint(coords.x, coords.y, coords.z, 5.0) then
-            local vehicle
-    
-            if IsPedInAnyVehicle(playerPed, false) then
-                vehicle = GetVehiclePedIsIn(playerPed, false)
-            else
-                vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0, 0, 71)
-            end
-    
-            if DoesEntityExist(vehicle) then
-                Citizen.CreateThread(function()
-                    SetVehicleFixed(vehicle)
-                    SetVehicleDeformationFixed(vehicle)
-                    SetVehicleUndriveable(vehicle, false)
-                    ClearPedTasksImmediately(playerPed)
-                    exports['mythic_notify']:SendAlert('inform', 'Car has been fixed', 6000)
-                end)
-            end
-        end
-    
+        mechShopArea = {{aVectorX,aVectorY}, {bVectorX,bVectorY}, {cVectorX,cVectorY}, {dVectorX,dVectorY}}
+
+        -- calculation to calculate a triangulation of all vectors to see if player is in a set perimiter
+        local table1 = {{aVectorX, aVectorY}, {pVectorX, pVectorY}, {dVectorX,dVectorY}}
+        local delta1 = shoeArea(table1)
+        local table2 = {{dVectorX,dVectorY}, {pVectorX,pVectorY}, {cVectorX, cVectorY}}
+        local delta2 = shoeArea(table2)
+        local table3 = {{cVectorX, cVectorY}, {pVectorX, pVectorY}, {bVectorX, bVectorY}}
+        local delta3 = shoeArea(table3)
+        local table4 = {{pVectorX,pVectorY}, {bVectorX,bVectorY}, {aVectorX,aVectorY}}
+        local delta4 = shoeArea(table4)
+        deltaSum = delta1 + delta2 + delta3 + delta4
+
+        if deltaSum == shoeArea(mechShopArea) then --when the for loop hits a mechanic perimiter the player is in set the variable to true
+            isInMechanicShop = true
+        end 
+    end
+
+    if isInMechanicShop == true then
+        exports['mythic_notify']:SendAlert('inform', 'You are in a mechanic area', 6000)
     else
-        print('you are not in the mech area')
-        exports['mythic_notify']:SendAlert('error', 'You are not in a mechanic area.', 6000)
-    end 
-      
+        exports['mythic_notify']:SendAlert('error', 'you arent in a mechanic shop dumbfuck', 6000)
+    end
 end)
 
+
+--calculate area of perimiter using shoelace algorythm
+function shoeArea(ps)
+    local function ssum(acc, p1, p2, ...)
+      if not p2 or not p1 then
+        return math.abs(0.5 * acc)
+      else
+        return ssum(acc + p1[1]*p2[2]-p1[2]*p2[1], p2, ...)
+      end
+    end
+    return ssum(0, ps[#ps], table.unpack(ps))
+end
