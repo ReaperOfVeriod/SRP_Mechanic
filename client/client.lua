@@ -44,9 +44,9 @@ end)
 RegisterNetEvent('flipCar')
 AddEventHandler('flipCar', function()
     TriggerEvent("mythic_progbar:client:progress", {
-        name = "unique_action_name",
+        name = "flipCar",
         duration = Config.FlipCarDuration,
-        label = "Action Label",
+        label = "Flipping vehicle",
         useWhileDead = false,
         canCancel = true,
         controlDisables = {
@@ -56,8 +56,8 @@ AddEventHandler('flipCar', function()
             disableCombat = true,
         },
         animation = {
-            animDict = "missheistdockssetup1clipboard@idle_a", -- needs new animation set
-            anim = "idle_a",
+            animDict = "anim@amb@business@weed@weed_inspecting_lo_med_hi@", -- needs new animation set
+            anim = "weed_spraybottle_stand_kneeling_01_inspector",
         },
     }, function(status)
         if not status then
