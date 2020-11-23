@@ -171,7 +171,7 @@ AddEventHandler('fixVehicle', function()
         }
     }, function(status)
         if not status then
-            isInMechanicShop = false
+            isInMechanicShop1 = false
             for k, v in pairs(mechShops) do
 
                 local aVector = mechShops[k][1]
@@ -208,12 +208,34 @@ AddEventHandler('fixVehicle', function()
                 deltaSum = delta1 + delta2 + delta3 + delta4
 
                 if deltaSum == shoeArea(mechShopArea) then --when the for loop hits a mechanic perimiter the player is in set the variable to true
-                    isInMechanicShop = true
+                    isInMechanicShop1 = true
                 end 
             end
 
-            if isInMechanicShop == true then
+            if isInMechanicShop1 == true then
                 exports['mythic_notify']:SendAlert('inform', 'You are in a mechanic area', 6000)
+                local playerPed = PlayerPedId()
+                local coords = GetEntityCoords(playerPed)
+        
+                if IsAnyVehicleNearPoint(coords.x, coords.y, coords.z, 5.0) then
+                    local vehicle
+        
+                    if IsPedInAnyVehicle(playerPed, false) then
+                        vehicle = GetVehiclePedIsIn(playerPed, false)
+                    else
+                        vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0, 0, 71)
+                    end
+        
+                    if DoesEntityExist(vehicle) then
+                        Citizen.CreateThread(function()
+                            SetVehicleFixed(vehicle)
+                            SetVehicleDeformationFixed(vehicle)
+                            SetVehicleUndriveable(vehicle, false)
+                            ClearPedTasksImmediately(playerPed)
+                            exports['mythic_notify']:SendAlert('inform', 'Car has been fixed', 6000)
+                        end)
+                    end
+                end
             else
                 exports['mythic_notify']:SendAlert('error', 'you arent in a mechanic shop dumbfuck', 6000)
             end
