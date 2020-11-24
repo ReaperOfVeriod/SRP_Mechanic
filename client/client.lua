@@ -2,6 +2,21 @@ mechShops = {}
 mechShops[0] = {vector3(1117.0, -765.0, 0.0), vector3(1117.0, -802.0, 0.0), vector3(1163.0, -802.0, 0.0), vector3(1163.0, -765.0, 0.0)} -- elgin ave
 mechShops[1] = {vector3(555.0, -163.0, 0.0), vector3(556.0, -202.0, 0.0), vector3(530.0, -249.0, 0.0), vector3(517.0, -164.0, 0.0)} -- mirror park
 mechShops[2] = {vector3(490.0, -1301.0, 0.0), vector3(441.0, -1317.0, 0.0), vector3(481.0, -1343.0, 0.0), vector3(519.0, -1344.0, 0.0)} -- hayes auto
+mechShops[3] = {vector3(-11.0, -1415.0, 0.0), vector3(-11.0, -1378.0, 0.0), vector3(-33.0, -1378.0, 0.0), vector3(-33.0, -1415.0, 0.0)} -- stoner shop
+
+
+--calculate area of perimiter using shoelace algorythm
+function shoeArea(ps)
+    local function ssum(acc, p1, p2, ...)
+      if not p2 or not p1 then
+        return math.abs(0.5 * acc)
+      else
+        return ssum(acc + p1[1]*p2[2]-p1[2]*p2[1], p2, ...)
+      end
+    end
+    return ssum(0, ps[#ps], table.unpack(ps))
+end
+
 
 -- request vehicle info
 RegisterNetEvent('vehicleInfo')
@@ -243,67 +258,49 @@ AddEventHandler('fixVehicle', function()
     end)
 end)
 
+local currentlyTowedVehicle = nil
 
-
-RegisterNetEvent('mechtest')
-AddEventHandler('mechtest', function()
-    isInMechanicShop = false
-    for k, v in pairs(mechShops) do
-
-        local aVector = mechShops[k][1]
-        local bVector = mechShops[k][2]
-        local cVector = mechShops[k][3]
-        local dVector = mechShops[k][4]
-
-        local playerPed = PlayerPedId()
-        local coords = GetEntityCoords(playerPed)
-
-        -- all vectors defined down to X and Y axis
-        local pVectorX = coords.x
-        local pVectorY = coords.y
-        local aVectorX = aVector.x
-        local aVectorY = aVector.y
-        local bVectorX = bVector.x
-        local bVectorY = bVector.y
-        local cVectorX = cVector.x
-        local cVectorY = cVector.y
-        local dVectorX = dVector.x
-        local dVectorY = dVector.y
+RegisterNetEvent('tow')
+AddEventHandler('tow', function()
     
-        mechShopArea = {{aVectorX,aVectorY}, {bVectorX,bVectorY}, {cVectorX,cVectorY}, {dVectorX,dVectorY}}
 
-        -- calculation to calculate a triangulation of all vectors to see if player is in a set perimiter
-        local table1 = {{aVectorX, aVectorY}, {pVectorX, pVectorY}, {dVectorX,dVectorY}}
-        local delta1 = shoeArea(table1)
-        local table2 = {{dVectorX,dVectorY}, {pVectorX,pVectorY}, {cVectorX, cVectorY}}
-        local delta2 = shoeArea(table2)
-        local table3 = {{cVectorX, cVectorY}, {pVectorX, pVectorY}, {bVectorX, bVectorY}}
-        local delta3 = shoeArea(table3)
-        local table4 = {{pVectorX,pVectorY}, {bVectorX,bVectorY}, {aVectorX,aVectorY}}
-        local delta4 = shoeArea(table4)
-        deltaSum = delta1 + delta2 + delta3 + delta4
-
-        if deltaSum == shoeArea(mechShopArea) then --when the for loop hits a mechanic perimiter the player is in set the variable to true
-            isInMechanicShop = true
-        end 
-    end
-
-    if isInMechanicShop == true then
-        exports['mythic_notify']:SendAlert('inform', 'You are in a mechanic area', 6000)
-    else
-        exports['mythic_notify']:SendAlert('error', 'you arent in a mechanic shop dumbfuck', 6000)
-    end
+    local playerped = GetPlayerPed(-1)
+	local vehicle = GetVehiclePedIsIn(playerped, true)
+	
+	local towmodel = GetHashKey('flatbed')
+	local isVehicleTow = IsVehicleModel(vehicle, towmodel)
+			
+	if isVehicleTow then
+	
+		local coordA = GetEntityCoords(playerped, 1)
+		local coordB = GetOffsetFromEntityInWorldCoords(playerped, 0.0, 5.0, 0.0)
+		local targetVehicle = getVehicleInDirection(coordA, coordB)
+		
+		if currentlyTowedVehicle == nil then
+			if targetVehicle ~= 0 then
+				if not IsPedInAnyVehicle(playerped, true) then
+					if vehicle ~= targetVehicle then
+						AttachEntityToEntity(targetVehicle, vehicle, 20, -0.5, -5.0, 1.0, 0.0, 0.0, 0.0, false, false, false, false, 20, true)
+						currentlyTowedVehicle = targetVehicle
+						exports['mythic_notify']:SendAlert('inform', 'Car has been put on the tow truck!', 6000)
+					else
+						exports['mythic_notify']:SendAlert('error', 'you fucking numbwit you cant tow your own vehicle...', 6000)
+					end
+				end
+			else
+				exports['mythic_notify']:SendAlert('error', 'ay dumbfuck where is the vehicle to tow..', 6000)
+			end
+		else
+			AttachEntityToEntity(currentlyTowedVehicle, vehicle, 20, -0.5, -12.0, 1.0, 0.0, 0.0, 0.0, false, false, false, false, 20, true)
+			DetachEntity(currentlyTowedVehicle, true, true)
+			currentlyTowedVehicle = nil
+			exports['mythic_notify']:SendAlert('inform', 'Car has been taken off the tow truck!', 6000)
+		end
+	end
 end)
 
-
---calculate area of perimiter using shoelace algorythm
-function shoeArea(ps)
-    local function ssum(acc, p1, p2, ...)
-      if not p2 or not p1 then
-        return math.abs(0.5 * acc)
-      else
-        return ssum(acc + p1[1]*p2[2]-p1[2]*p2[1], p2, ...)
-      end
-    end
-    return ssum(0, ps[#ps], table.unpack(ps))
+function getVehicleInDirection(coordFrom, coordTo)
+	local rayHandle = CastRayPointToPoint(coordFrom.x, coordFrom.y, coordFrom.z, coordTo.x, coordTo.y, coordTo.z, 10, GetPlayerPed(-1), 0)
+	local a, b, c, d, vehicle = GetRaycastResult(rayHandle)
+	return vehicle
 end

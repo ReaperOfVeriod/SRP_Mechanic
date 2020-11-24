@@ -31,7 +31,7 @@ end)
 
 
 -- command registration for test 
-RegisterCommand('mechtest', function(source,args,raw)
+RegisterCommand('tow', function(source,args,raw)
     local source = tonumber(source)
-    TriggerClientEvent('mechtest', source)
+    TriggerClientEvent('tow', source)
 end)
