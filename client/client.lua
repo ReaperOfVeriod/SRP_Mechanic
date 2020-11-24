@@ -1,7 +1,7 @@
 mechShops = {}
-mechShops[0] = {vector3(1117.0, -765.0, 0.0), vector3(1117.0, -802.0, 0.0), vector3(1163.0, -802.0, 0.0), vector3(1163.0, -765.0, 0.0)}
-mechShops[1] = {vector3(555.0, -163.0, 0.0), vector3(556.0, -202.0, 0.0), vector3(530.0, -249.0, 0.0), vector3(517.0, -164.0, 0.0)}
-
+mechShops[0] = {vector3(1117.0, -765.0, 0.0), vector3(1117.0, -802.0, 0.0), vector3(1163.0, -802.0, 0.0), vector3(1163.0, -765.0, 0.0)} -- elgin ave
+mechShops[1] = {vector3(555.0, -163.0, 0.0), vector3(556.0, -202.0, 0.0), vector3(530.0, -249.0, 0.0), vector3(517.0, -164.0, 0.0)} -- mirror park
+mechShops[2] = {vector3(490.0, -1301.0, 0.0), vector3(441.0, -1317.0, 0.0), vector3(481.0, -1343.0, 0.0), vector3(519.0, -1344.0, 0.0)} -- hayes auto
 
 -- request vehicle info
 RegisterNetEvent('vehicleInfo')
